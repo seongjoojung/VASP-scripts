@@ -1,3 +1,5 @@
+# NOTE: only implemented for orthogonal systems     
+
 import numpy as np
 import sys
 import warnings
@@ -5,7 +7,7 @@ import warnings
 # Ignore complex to float warning
 warnings.filterwarnings('ignore')
 
-# small values to ignore
+# set small values to ignore
 n = len(sys.argv)
 if n == 4:
     zero_NMC = float(sys.argv[1])
