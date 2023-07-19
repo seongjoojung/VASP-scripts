@@ -1,4 +1,8 @@
-# NOTE: only implemented for orthogonal systems     
+"""
+NOTE: only implemented for orthogonal systems    
+
+Requires IBRION=5-8, LEPSILON = T tag in VASP INCAR
+"""   
 
 import numpy as np
 import sys
