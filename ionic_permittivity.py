@@ -1,8 +1,20 @@
 import numpy as np
+import sys
 import warnings
 
-#Ignore complex to float warning
+# Ignore complex to float warning
 warnings.filterwarnings('ignore')
+
+# small values to ignore
+n = len(sys.argv)
+if n == 4:
+    zero_NMC = float(sys.argv[1])
+    zero_MOS = float(sys.argv[2])
+    zero_ICP = float(sys.argv[3])
+else:
+    zero_NMC = float(input("zero criterion for Normal Mode Charges: "))
+    zero_MOS = float(input("zero criterion for Mode Oscillator Strength: "))
+    zero_ICP = float(input("zero criterion for Ionic Contribution to Permittivity: "))
 
 #############################################
 #     Read data from CONTCAR and OUTCAR     #
@@ -29,7 +41,7 @@ elements = line.split()
 
 #read number of atoms for each element from next line
 line = contcar.readline()
-element_count = list(map(int, line.split()))
+element_count = np.array(line.split(), dtype=int)
 n_ion = np.sum(element_count)
 
 contcar.close()
@@ -82,7 +94,7 @@ np.savetxt("permittivity_inf.dat", eps_inf, fmt='%.5g', delimiter='\t')
 #Born effective charge tensor
 BEC = np.zeros((n_ion, 3, 3))
 
-#skip until you find 'BORN EFFECTIVE CHARGES' again
+#skip until you find 'BORN EFFECTIVE CHARGES'
 while True:
     line = outcar.readline()
     if len(line.split()) == 0:
@@ -108,7 +120,7 @@ np.savetxt("BEC_z.dat", BEC[:,2,2], fmt='%.5g', delimiter='\t')
 eigenvalues = np.zeros(3*n_ion, dtype=complex) #2PiTHz
 eigenvectors = np.zeros((3*n_ion,3*n_ion))     #each row is eigenvector, not column
 
-#skip until you find 'BORN EFFECTIVE CHARGES' again
+#skip until you find 'Eigenvectors' again
 while True:
     line = outcar.readline()
     if len(line.split()) == 0:
@@ -136,6 +148,9 @@ for i in range(3*n_ion):
         eigenvectors[i,3*j+2] = float(line.split()[5])
 
     outcar.readline()
+
+print("\nEigenvalues (2PiTHz):")
+print(eigenvalues)
 
 np.savetxt("eigenvalues.dat", eigenvalues, fmt='%.5g', delimiter='\t')
 np.savetxt("eigenvectors.dat", eigenvectors, fmt='%.5g', delimiter='\t')
@@ -167,32 +182,33 @@ for i in range(3*n_ion):
     NMC[i] = BEC_reshape @ N[i]
 
 #zero out the error
-NMC[np.abs(NMC) < 1e-1] = 0
+NMC[np.abs(NMC) < zero_NMC] = 0
 np.set_printoptions(precision=3)
-print("Normal Mode Charges:")
+print("\nNormal Mode Charges:")
 print(NMC)
 
-MOC = np.zeros((3*n_ion, 3, 3)) #Mode oscilator strength, C^2/kg
+MOS = np.zeros((3*n_ion, 3, 3)) #Mode oscilator strength, C^2/kg
 
 for m in range(3*n_ion):
     a = U[m] @ (BEC_reshape.T*e_charge)
     a = np.reshape(a, (1,3))
-    MOC[m] = a.T @ a
+    MOS[m] = a.T @ a
 
 #zero out the error
-MOC[np.abs(MOC) < 1e-14] = 0
+MOS[np.abs(MOS) < zero_MOS] = 0
 
 print("\nMode Oscillator Strength (C^2/kg):")
-print(MOC)
+print(MOS)
 
 ICP = np.zeros((3,3)) #ionic contribution to permittivity
 
 for m in range(3*n_ion):
-    ICP += 1/(volume*vac_per)*MOC[m]/(float(eigenvalues[m]**2))
+    ICP += 1/(volume*vac_per)*MOS[m]/(float(eigenvalues[m]**2))
 
 #zero out the error
-ICP[np.abs(ICP) < 1e-10] = 0
+ICP[np.abs(ICP) < zero_ICP] = 0
 
-print("\nIonic Contribution to Dielectric Constant:")
-print(ICP)
+print("\nIonic Contribution to Dielectric Constant:", end='\n')
+print(ICP, end='\n')
+
 np.savetxt("permittivity_ionic.dat", ICP, fmt='%.5g', delimiter='\t')
