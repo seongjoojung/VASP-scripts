@@ -9,16 +9,6 @@ import sys
 import os
 import re
 
-def get_energy(outcar="OUTCAR"):
-    if not os.path.isfile(outcar):
-        print("OUTCAR file not found")
-        return None
-    
-    txt = open(outcar).read()
-    energy = re.findall(r'energy\(sigma->0\) =\s*[-+]?(?:\d*\.*\d+)', txt)[-1].split()[-1]
-
-    return float(energy)
-
 def get_dipoles(outcar="OUTCAR"):
     if not os.path.isfile(outcar):
         print("OUTCAR file not found")
