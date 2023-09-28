@@ -1,6 +1,4 @@
 """
-NOTE: only implemented for orthogonal systems  
-
 Requires LCALCEPS = T tag in VASP INCAR
 Requires CONTCAR and OUTCAR in directory
 """   
