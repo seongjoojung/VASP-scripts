@@ -34,34 +34,38 @@ def get_lattice(contcar="CONTCAR"):
     for i in range(3):
         line = contcar.readline()
 
-    #lattice constants
-    a = float(line.split()[0]) #Angst
-    line = contcar.readline()
-    b = float(line.split()[1]) #Angst
-    line = contcar.readline()
-    c = float(line.split()[2]) #Angst
-    contcar.close()
+    lattice = np.zeros((3,3), dtype=float)
 
-    lattice = np.array([a,b,c], dtype=float)
+    #lattice constants
+    lattice[0] = line.split() #Angst
+    line = contcar.readline()
+    lattice[1] = line.split() #Angst
+    line = contcar.readline()
+    lattice[2] = line.split() #Angst
+    contcar.close()
 
     return lattice
 
 #start here
 n_arg = len(sys.argv)
 
-if n_arg < 4: 
-    print("Provide P quantum offset for Berry phase polarization calculation")
-elif n_arg == 4: #non-polar ionic dipole moment provided
+if n_arg == 4: #non-polar ionic dipole moment provided
     print("P quantum offset read: " + sys.argv[1] + ' ' + sys.argv[2] + ' ' + sys.argv[3])
     P_quantum_offset = np.array([sys.argv[1], sys.argv[2], sys.argv[3]], dtype=float)
 else: 
-    print("Provide P quantum offset for Berry phase polarization calculation")
+    print("Provide polarization quantum offset for Berry phase polarization calculation")
+    P_quantum_offset = np.zeros(3, dtype=float)
+    P_quantum_offset[0] = input("a offset: ")
+    P_quantum_offset[1] = input("b offset: ")
+    P_quantum_offset[2] = input("c offset: ")
+
 
 #read files
 lattice = get_lattice()
-a = lattice[0]
-b = lattice[1]
-c = lattice[2]
+a = np.linalg.norm(lattice[0])
+b = np.linalg.norm(lattice[1])
+c = np.linalg.norm(lattice[2])
+volume = np.absolute(np.dot(np.cross(lattice[0],lattice[1]),lattice[2]))
 dipole_ion, dipole_elec = get_dipoles()
 
 #elementary charge
@@ -74,12 +78,12 @@ print(dipole_ion)
 print("electronic dipole:")
 print(dipole_elec)
 
-P_quantum = lattice*(e*10**20)/(a*b*c)
+P_quantum = np.array([a,b,c])*(e*10**20)/volume
 print("Polarization quantum (C/m^2):")
 print(P_quantum)
 
 #dipole moment is in units of electrons*Angst, opposite sign!
-Berry_P = -(dipole_ion + dipole_elec)*(e*10**20)/(a*b*c)
+Berry_P = -(dipole_ion + dipole_elec)*(e*10**20)/volume
 
 for i in range(3):
     while(Berry_P[i] < -1e-4):
