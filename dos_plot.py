@@ -1,7 +1,7 @@
-########################################################
-# noncollinear PDOS, specific to Pt/PbTiO3 calculation #
-# using ElementTree to import xml data                 #
-########################################################
+"""
+noncollinear PDOS 
+using ElementTree to import xml data
+"""
 
 import xml.etree.ElementTree as ET
 import numpy as np
@@ -18,14 +18,8 @@ tree = ET.parse('vasprun.xml')
 root = tree.getroot()
 dos = list(root.iter("dos"))[0] #root.iter returns iteratable, list()[0] returns element
 
-#print(dos[0]) #[calculation][dos][efermi]
-
 efermi = float(dos[0].text.split()[0])
 
-##print(dos[1]) #[calculation][dos][total]
-#print(dos[2]) #[calculation][dos][partial]
-#print(dos[2][0][13][0].attrib) #ion 1
-#print(dos[2][0][13][0][0].attrib) #spin 1
 nrow = len(dos[2][0][13][0][0])
 ncol = len(dos[2][0][13][0][0][0].text.split())
 DOS = np.zeros((N, nrow, ncol))
@@ -48,11 +42,8 @@ DOS = DOS[:,:,1:]
 for n, j in enumerate(atoms): #n: 0-N atom index, j: atom number
 
     cm = 1/2.54
-#    if j < 22: #P++
     fig = plt.figure(figsize=(18*cm,5*cm), tight_layout=False)
-#    if j > 21: #P++
-#        fig = plt.figure(figsize=(18*cm,6*cm), tight_layout=False)  #P++
-#        plt.subplots_adjust(top=0.88,bottom=0.249,left=0.125,right=0.9)  #P++
+
     ax = plt.axes()
     plt.plot(x, DOS[n][:, 0], label="$s$")
     plt.plot(x, DOS[n][:, 1]+DOS[n][:, 2]+DOS[n][:, 3], label="$p$")
@@ -67,18 +58,10 @@ for n, j in enumerate(atoms): #n: 0-N atom index, j: atom number
     
     plt.vlines(0, ax.get_ylim()[0],ax.get_ylim()[1], 'gray', linestyles='dotted')
  
-#    ax.xaxis.set_ticklabels([])
     plt.xlabel("$E-E_f$ (eV)", fontsize=13)  #P++
     
     plt.ylabel("DOS (a.u.)", fontsize=13)         #P0
     plt.legend(prop={'size': 11}, frameon=False)  #P0
     plt.savefig("Atom_" + str(j) + ".png" , transparent=True)
     plt.show()
-
-
-
-
-
-
-
 
