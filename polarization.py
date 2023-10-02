@@ -53,9 +53,9 @@ if n_arg == 4: #non-polar ionic dipole moment provided
 else: 
     print("Provide polarization quantum offset for Berry phase polarization calculation")
     P_quantum_offset = np.zeros(3, dtype=float)
-    P_quantum_offset[0] = input("a offset: ")
-    P_quantum_offset[1] = input("b offset: ")
-    P_quantum_offset[2] = input("c offset: ")
+    P_quantum_offset[0] = input("a offset: ") or 0
+    P_quantum_offset[1] = input("b offset: ") or 0
+    P_quantum_offset[2] = input("c offset: ") or 0
 
 
 #read files
@@ -101,4 +101,3 @@ print(Berry_P - P_quantum)
 print(Berry_P + P_quantum)
 
 np.savetxt("Berry_P.dat", Berry_P, fmt='%.5f')
-exit

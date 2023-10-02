@@ -18,9 +18,9 @@ if n == 4:
     zero_MOS = float(sys.argv[2])
     zero_ICP = float(sys.argv[3])
 else:
-    zero_NMC = float(input("zero criterion for Normal Mode Charges: "))
-    zero_MOS = float(input("zero criterion for Mode Oscillator Strength: "))
-    zero_ICP = float(input("zero criterion for Ionic Contribution to Permittivity: "))
+    zero_NMC = float(input("zero criterion for Normal Mode Charges: ") or 0)
+    zero_MOS = float(input("zero criterion for Mode Oscillator Strength: ") or 0)
+    zero_ICP = float(input("zero criterion for Ionic Contribution to Permittivity: ") or 0)
 
 #############################################
 #     Read data from CONTCAR and OUTCAR     #
