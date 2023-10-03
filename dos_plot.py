@@ -1,5 +1,5 @@
 """
-noncollinear PDOS 
+non-magnetic PDOS (LORBIT = 1 or 11, ISPIN = 1)
 using ElementTree to import xml data
 """
 
