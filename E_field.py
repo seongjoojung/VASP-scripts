@@ -140,7 +140,9 @@ def draw_stream(axis, slice, name, lattice, grid, potential, charge, broken_stre
         fig1.set_figwidth(between(3, c/4+1, 10))
         fig1.set_figheight(between(2.6, b/4, 10))
         ax1.set_xlim(0,c)
+        ax1.set_xlabel("z (" + 	u"\u212B" + ")")
         ax1.set_ylim(0,b)
+        ax1.set_ylabel("y (" + 	u"\u212B" + ")")
 
         #reshape based on repeating lattice
         potential_fill = np.zeros((grid[1]+1,grid[2]+1))
@@ -163,7 +165,9 @@ def draw_stream(axis, slice, name, lattice, grid, potential, charge, broken_stre
         fig1.set_figwidth(between(3, a/4+1, 10))
         fig1.set_figheight(between(2.6, c/4, 10))
         ax1.set_xlim(0,a)
+        ax1.set_xlabel("x (" + 	u"\u212B" + ")")
         ax1.set_ylim(0,c)
+        ax1.set_ylabel("z (" + 	u"\u212B" + ")")
 
         #reshape based on repeating lattice
         potential_fill = np.zeros((grid[0]+1,grid[2]+1))
@@ -184,7 +188,9 @@ def draw_stream(axis, slice, name, lattice, grid, potential, charge, broken_stre
         fig1.set_figwidth(between(3, a/4+1, 10))
         fig1.set_figheight(between(2.6, b/4, 10))
         ax1.set_xlim(0,a)
-        ax1.set_ylim(0,c)
+        ax1.set_xlabel("x (" + 	u"\u212B" + ")")
+        ax1.set_ylim(0,b)
+        ax1.set_ylabel("y (" + 	u"\u212B" + ")")
 
         #reshape based on repeating lattice
         potential_fill = np.zeros((grid[0]+1,grid[1]+1))
@@ -219,7 +225,7 @@ def draw_stream(axis, slice, name, lattice, grid, potential, charge, broken_stre
     mask_y = np.array([], dtype=float)
     for i in range(X.shape[0]): #y axis
         for j in range(X.shape[1]): #x axis
-            if ((charge_fill > 1) | (charge_fill < 0)).T[i,j]:
+            if ((charge_fill > 1)).T[i,j]:
                 mask_x = np.concatenate((mask_x, x_fig[j]), axis=None)
                 mask_y = np.concatenate((mask_y, y_fig[i]), axis=None)
 
@@ -260,7 +266,9 @@ def draw_quiver(axis, slice, name, lattice, grid, potential, charge):
         fig1.set_figwidth(between(3, c/4+1, 10))
         fig1.set_figheight(between(2.6, b/4, 10))
         ax1.set_xlim(0,c)
+        ax1.set_xlabel("z (" + 	u"\u212B" + ")")
         ax1.set_ylim(0,b)
+        ax1.set_ylabel("y (" + 	u"\u212B" + ")")
 
         #reshape based on repeating lattice
         potential_fill = np.zeros((grid[1]+1,grid[2]+1))
@@ -283,7 +291,9 @@ def draw_quiver(axis, slice, name, lattice, grid, potential, charge):
         fig1.set_figwidth(between(3, a/4+1, 10))
         fig1.set_figheight(between(2.6, c/4, 10))
         ax1.set_xlim(0,a)
+        ax1.set_xlabel("x (" + 	u"\u212B" + ")")
         ax1.set_ylim(0,c)
+        ax1.set_ylabel("z (" + 	u"\u212B" + ")")
 
         #reshape based on repeating lattice
         potential_fill = np.zeros((grid[0]+1,grid[2]+1))
@@ -304,7 +314,9 @@ def draw_quiver(axis, slice, name, lattice, grid, potential, charge):
         fig1.set_figwidth(between(3, a/4+1, 10))
         fig1.set_figheight(between(2.6, b/4, 10))
         ax1.set_xlim(0,a)
+        ax1.set_xlabel("x (" + 	u"\u212B" + ")")
         ax1.set_ylim(0,b)
+        ax1.set_ylabel("y (" + 	u"\u212B" + ")")
 
         #reshape based on repeating lattice
         potential_fill = np.zeros((grid[0]+1,grid[1]+1))
@@ -355,32 +367,30 @@ def draw_quiver(axis, slice, name, lattice, grid, potential, charge):
     grad_X = -grad[0]
     grad_Y = -grad[1]
 
-    # #mask too large fields
-    # print("\nmax charge:" + "{:g}".format(np.max(charge_fill)))
-    # print("min charge:" + "{:g}".format(np.min(charge_fill)))
-    # print()
-    # charge_fill = charge_fill.T
-    # fig, ax = plt.subplots(tight_layout=True)
-    # cp = ax.contour(X, Y, charge_fill, np.linspace(-1, 1, 11), cmap='coolwarm')
-    # cbar = fig.colorbar(cp)
-    # charge_fill = charge_fill.T
+    #mask areas with high charges
+    grad_X[(charge_fill > 1)] = 0
+    grad_Y[(charge_fill > 1)] = 0
 
-    #mask areas with high and negative (dipole correction) charges
-    grad_X[(charge_fill > 1) | (charge_fill < 0)] = 0
-    grad_Y[(charge_fill > 1) | (charge_fill < 0)] = 0
-    
+    #mask areas at the dipole correction
+    if axis == 'x': 
+        grad_X[(X.T < 0 + 0.3) | (X.T > c - 0.3)] = 0
+        grad_Y[(X.T < 0 + 0.3) | (X.T > c - 0.3)] = 0
+    elif axis == 'y': 
+        grad_X[(Y.T < 0 + 0.3) | (Y.T > c - 0.3)] = 0
+        grad_Y[(Y.T < 0 + 0.3) | (Y.T > c - 0.3)] = 0
+
     mask_x = np.array([], dtype=float)
     mask_y = np.array([], dtype=float)
     for i in range(X.shape[0]): #y axis
         for j in range(X.shape[1]): #x axis
-            if ((charge_fill > 1) | (charge_fill < 0)).T[i,j]:
+            if ((charge_fill > 1)).T[i,j]:
                 mask_x = np.concatenate((mask_x, x_fig[j]), axis=None)
                 mask_y = np.concatenate((mask_y, y_fig[i]), axis=None)
 
     ax1.scatter(mask_x,mask_y,s=6,c='black')
 
     step=8
-    ax1.quiver(X[::step,::step], Y[::step,::step], grad_X.T[::step,::step], grad_Y.T[::step,::step], width=0.002, scale=10)    
+    ax1.quiver(X[::step,::step], Y[::step,::step], grad_X.T[::step,::step], grad_Y.T[::step,::step], width=0.002, scale=8)    
     plt.savefig(name + "_contour.png")
 
 
