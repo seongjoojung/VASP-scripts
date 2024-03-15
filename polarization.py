@@ -80,8 +80,9 @@ P_quantum = np.array([a,b,c])*(e*10**20)/volume
 print("Polarization quantum (C/m^2):")
 print(P_quantum)
 
-#dipole moment is in units of electrons*Angst, opposite sign!
-Berry_P = -(dipole_ion + dipole_elec)*(e*10**20)/volume
+#dipole moment is in units of electrons*Angst, opposite sign! (VASP 5 or below)
+#sign convention is fixed for VASP6 and above
+Berry_P = (dipole_ion + dipole_elec)*(e*10**20)/volume
 
 for i in range(3):
     while(Berry_P[i] < -1e-4):
