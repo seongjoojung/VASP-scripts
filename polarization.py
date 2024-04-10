@@ -1,5 +1,5 @@
 """
-Requires LCALCEPS = T tag in VASP INCAR
+Requires LCALCPOL = T tag in VASP INCAR
 Requires CONTCAR and OUTCAR in directory
 """   
 import numpy as np
@@ -60,9 +60,6 @@ else:
 
 #read files
 lattice = get_lattice()
-a = np.linalg.norm(lattice[0])
-b = np.linalg.norm(lattice[1])
-c = np.linalg.norm(lattice[2])
 volume = np.absolute(np.dot(np.cross(lattice[0],lattice[1]),lattice[2]))
 dipole_ion, dipole_elec = get_dipoles()
 
@@ -76,7 +73,7 @@ print(dipole_ion)
 print("electronic dipole:")
 print(dipole_elec)
 
-P_quantum = np.array([a,b,c])*(e*10**20)/volume
+P_quantum = np.array([lattice[0,0],lattice[1,1],lattice[2,2]])*(e*10**20)/volume
 print("Polarization quantum (C/m^2):")
 print(P_quantum)
 
@@ -85,10 +82,10 @@ print(P_quantum)
 Berry_P = (dipole_ion + dipole_elec)*(e*10**20)/volume
 
 for i in range(3):
-    while(Berry_P[i] < -1e-4):
+    while(Berry_P[i] < -5e-4):
         Berry_P[i] += P_quantum[i]
 
-    while(Berry_P[i] > P_quantum[i] - 1e-4):
+    while(Berry_P[i] > P_quantum[i] - 5e-4):
         Berry_P[i] -= P_quantum[i]
 
 #add offset
