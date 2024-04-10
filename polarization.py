@@ -73,6 +73,7 @@ print(dipole_ion)
 print("electronic dipole:")
 print(dipole_elec)
 
+#dipole moments are calculated in the reciprocal lattice vector directions, not all values will be meaningful
 P_quantum = np.array([lattice[0,0],lattice[1,1],lattice[2,2]])*(e*10**20)/volume
 print("Polarization quantum (C/m^2):")
 print(P_quantum)
